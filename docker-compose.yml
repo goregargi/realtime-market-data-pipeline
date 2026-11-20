@@ -66,5 +66,18 @@ services:
       timeout: 5s
       retries: 20
 
+  producer:
+    build: ./producer
+    container_name: producer
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SOURCE: ${SOURCE:-coinbase}
+      PRODUCTS: ${PRODUCTS:-BTC-USD,ETH-USD,SOL-USD}
+      SIMULATE_TRADES_PER_SEC: ${SIMULATE_TRADES_PER_SEC:-25}
+    restart: unless-stopped
+
 volumes:
   timescale-data:
