@@ -79,5 +79,28 @@ services:
       SIMULATE_TRADES_PER_SEC: ${SIMULATE_TRADES_PER_SEC:-25}
     restart: unless-stopped
 
+  spark-streaming:
+    build: ./streaming
+    container_name: spark-streaming
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+      timescaledb:
+        condition: service_healthy
+    ports:
+      - "4040:4040"
+    environment:
+      <<: *db-env
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      CHECKPOINT_DIR: /checkpoints
+      TRIGGER_INTERVAL: ${TRIGGER_INTERVAL:-10 seconds}
+      WATERMARK_DELAY: ${WATERMARK_DELAY:-2 minutes}
+    volumes:
+      - spark-checkpoints:/checkpoints
+      - ivy-cache:/opt/ivy
+    restart: unless-stopped
+
 volumes:
   timescale-data:
+  spark-checkpoints:
+  ivy-cache:
