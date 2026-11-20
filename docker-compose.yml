@@ -58,6 +58,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-market}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-market}
     volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
       - timescale-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
